@@ -2,8 +2,11 @@
 <script setup>
 import { ref } from 'vue'
 import Modal from '@/components/modal/Modal.vue'
+import { useSearch } from '@/composables/state';
 
-const search = ref('')
+const config = useRuntimeConfig()
+
+const search = useSearch()
 const isModalFormOpen = ref(false)
 const form = reactive({
   id: '',
@@ -26,7 +29,7 @@ function openModalForUpdate(note){
   isModalFormOpen.value = true
 }
 
-const {data, pending, refresh, execute, error} = useFetch(`http://localhost:8000/api/note`, {
+const {data, pending, refresh, execute, error} = useFetch(`${config.public.api_url}/api/note`, {
   params: {
     search : search || '',
   },
@@ -38,7 +41,7 @@ function create({
   title, 
   description
 }){
-  $fetch(`http://localhost:8000/api/note`, {
+  $fetch(`${config.public.api_url}/api/note`, {
     method: 'POST',
     body: {
       title,
@@ -54,7 +57,7 @@ function update(id, {
   title,
   description,
 }){
-  $fetch(`http://localhost:8000/api/note/${id}`, {
+  $fetch(`${config.public.api_url}/api/note/${id}`, {
     method: 'PUT',
     body: {
       title,
@@ -67,7 +70,7 @@ function update(id, {
 }
 
 function destroy(id){
-  $fetch(`http://localhost:8000/api/note/${id}`, {
+  $fetch(`${config.public.api_url}/api/note/${id}`, {
     method: 'DELETE'
   })
   .then(response => {
@@ -93,28 +96,6 @@ function handleSubmit(){
 </script>
 
 <template>
-  <div class="w-full max-w-6xl mx-auto px-4 py-2">
-    <nav class="sticky top-0 w-full inline-flex justify-between items-center">
-      <h1 class="font-semibold text-xl">My Notes</h1>
-      <form>   
-          <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label>
-          <div class="relative">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <svg aria-hidden="true" class="w-5 h-5 text-gray-500 " fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                  </svg>
-              </div>
-              <input
-                type="search"
-                id="default-search"
-                class="block w-full p-2 pl-10 text-sm text-gray-900 border border-black rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 "
-                placeholder="Search " 
-                v-model="search"
-                />
-          </div>
-      </form>
-    </nav>
-  </div>
   <section id="notes" class="w-full max-w-6xl mx-auto px-4 py-2 flex flex-col space-y-4">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center items-stretch p-6 bg-white border border-gray-200 rounded-lg shadow">
       <div class="col-span-full inline-flex justify-end">

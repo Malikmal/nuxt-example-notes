@@ -1,5 +1,13 @@
+<!-- <script setup>
+import GeneralCard from '@/components/card/GeneralCard.vue';
+</script> -->
+
 <template>
   <div>
-    <NuxtPage/>
+    <!-- <GeneralCard></GeneralCard>
+    <NuxtWelcome /> -->
+    <NuxtLayout>
+      <NuxtPage/>
+    </NuxtLayout>
   </div>
 </template>

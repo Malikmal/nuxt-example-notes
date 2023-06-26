@@ -4,5 +4,10 @@ export default defineNuxtConfig({
   modules: [
     '@nuxtjs/tailwindcss',
     'nuxt-headlessui',
-  ]
+  ],
+  runtimeConfig: {
+    public: {
+      api_url: process.env.API_URL
+    }
+  }
 })
