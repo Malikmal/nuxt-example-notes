@@ -11,7 +11,7 @@ const search = useSearch()
         <header class="w-full max-w-6xl mx-auto px-4 py-2 sticky top-0 bg-white border-b border-gray-200 shadow-sm">
             <nav class="w-full inline-flex justify-between items-center">
                 <h1 class="font-semibold text-xl">My Notes</h1>
-                <form>   
+                <form @submit.prevent="">   
                     <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">

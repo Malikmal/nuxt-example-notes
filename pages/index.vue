@@ -1,6 +1,6 @@
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Modal from '@/components/modal/Modal.vue'
 import { useSearch } from '@/composables/state';
 import NoteCard from '@/components/card/NoteCard.vue';
@@ -9,11 +9,27 @@ const config = useRuntimeConfig()
 
 const search = useSearch()
 const isModalFormOpen = ref(false)
+const paginationFlag = ref()
 const form = reactive({
   id: '',
   title: '',
   description: '',
 })
+const loadedNotes = ref([])
+const nextPage = ref(1)
+
+onMounted(() => {
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => entry.isIntersecting && loadMore(), {
+      rootMargin: "-150px 0px 0px 0px"
+  }));
+
+  observer.observe(paginationFlag.value)
+}),
+
+watch(
+  search,
+  () => refreshData()
+)
 
 function openModalForCreate(){
   form.id = ''
@@ -30,13 +46,33 @@ function openModalForUpdate(note){
   isModalFormOpen.value = true
 }
 
-const {data, pending, refresh, execute, error} = useFetch(`${config.public.api_url}/api/note`, {
-  params: {
-    search : search || '',
-  },
-  lazy: true,
-  server: false,
-})
+function loadMore(){
+  getAll(nextPage.value)
+}
+
+function refreshData(){
+  loadedNotes.value = []
+  nextPage.value = 1
+  getAll(nextPage.value)
+}
+
+function getAll(page = 1){
+  $fetch(`${config.public.api_url}/api/note`, {
+    params: {
+      search : search.value || '',
+      page: page,
+
+    },
+    lazy: true,
+    server: false,
+  }).then(response => {
+    loadedNotes.value = [
+      ...loadedNotes.value,
+      ...(response?.data?.data || [])
+    ]
+    nextPage.value = page + 1
+  })
+}
 
 function create({
   title, 
@@ -50,7 +86,7 @@ function create({
     }
   })
   .then(response => {
-    refresh()
+    refreshData()
   })
 }
 
@@ -66,7 +102,7 @@ function update(id, {
     }
   })
   .then(response => {
-    refresh()
+    refreshData()
   })
 }
 
@@ -75,7 +111,7 @@ function destroy(id){
     method: 'DELETE'
   })
   .then(response => {
-    refresh()
+    refreshData()
     isModalFormOpen.value = false
   })
 }
@@ -103,13 +139,14 @@ function handleSubmit(){
         <button type="button" @click="openModalForCreate" class="cols-span-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ">Create</button>
       </div>
       <NoteCard
-        v-for="note in data?.data?.data"
+        v-for="note in loadedNotes"
         :key="note.id"
         :note="note"
-        @click="() => openModalForUpdate(note)"
+        @onClick="() => openModalForUpdate(note)"
         @onDelete="id => destroy(id)"
       />
     </div>
+    <div ref="paginationFlag"></div>
   </section>
   <Modal :show="isModalFormOpen" @close="isModalFormOpen = false">
     <form @submit.prevent="handleSubmit" class="p-4 flex flex-col space-y-4">
