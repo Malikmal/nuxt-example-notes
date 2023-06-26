@@ -1,9 +1,9 @@
 # Nuxt 3 Minimal Starter
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
-## Screenshot
+## Demo
 
-<img width="1680" alt="image" src="https://github.com/Malikmal/nuxt-example-notes/assets/36214726/a4249933-2652-4bc4-bce4-79d94829b939">
+https://jam.dev/c/b6a4f259-f6f6-48a8-8ad0-6adbb54ef83b
 
 ## Guide Setup
 
